@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幾點出門？抽籤器</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; display: grid; place-items: center;
+  padding: 24px; font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  background: linear-gradient(135deg, #eaf4ff, #e8e6ff); color: #29354a;
+}
+.container {
+  width: min(100%, 520px); padding: 32px; background: #fff;
+  border-radius: 20px; box-shadow: 0 12px 35px rgba(36,55,90,.12);
+}
+h1 { margin: 0 0 8px; text-align: center; font-size: 30px; }
+.intro { margin: 0 0 24px; text-align: center; color: #69758b; }
+label { display: block; margin-bottom: 9px; font-weight: 700; }
+textarea {
+  width: 100%; min-height: 150px; padding: 14px; resize: vertical;
+  border: 1px solid #d5deed; border-radius: 12px; font: inherit;
+  line-height: 1.7; outline: none;
+}
+textarea:focus { border-color: #718de0; box-shadow: 0 0 0 3px #718de022; }
+button {
+  width: 100%; margin-top: 18px; padding: 14px; border: 0;
+  border-radius: 12px; background: #5675d5; color: white;
+  font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
+}
+button:hover { background: #405fbd; }
+.result {
+  min-height: 120px; margin-top: 22px; padding: 18px;
+  display: grid; place-items: center; text-align: center;
+  background: #f2f5ff; border: 1px dashed #9eafe9; border-radius: 14px;
+}
+.result-label { color: #667493; font-size: 14px; }
+#resultText { margin-top: 7px; color: #405fbd; font-size: 38px; font-weight: 800; overflow-wrap: anywhere; }
+#resultText.error { color: #b42318; font-size: 16px; }
+.hint { margin: 14px 0 0; color: #7c879b; font-size: 13px; text-align: center; }
+</style>
+</head>
+<body>
+<main class="container">
+  <h1>幾點出門？</h1>
+  <p class="intro">出門時間交給抽籤器決定！</p>
+  <label for="options">輸入出門時間（每行一個）</label>
+  <textarea id="options" placeholder="例如：10:00&#10;11:00&#10;12:00&#10;13:00">10:00
+11:00
+12:00
+13:00</textarea>
+  <button id="drawButton" type="button">幫我選</button>
+  <section class="result" aria-live="polite" aria-atomic="true">
+    <div>
+      <div class="result-label">今天就決定這個時間出門！</div>
+      <div id="resultText">等你來抽籤</div>
+    </div>
+  </section>
+  <p class="hint">空白行會自動忽略，相同選項只保留一次。</p>
+</main>
+<script>
+const optionsInput = document.getElementById("options");
+const drawButton = document.getElementById("drawButton");
+const resultText = document.getElementById("resultText");
+
+drawButton.addEventListener("click", () => {
+  // 去除每行前後空白、忽略空白行，並移除完全相同的重複選項。
+  const options = [...new Set(
+    optionsInput.value
+      .split(/\r?\n/)
+      .map(option => option.trim())
+      .filter(option => option.length > 0)
+  )];
+
+  if (options.length === 0) {
+    resultText.textContent = "請先輸入至少一個選項";
+    resultText.classList.add("error");
+    return;
+  }
+
+  // 每個有效選項的中籤機率相同。
+  const randomIndex = Math.floor(Math.random() * options.length);
+  resultText.textContent = options[randomIndex];
+  resultText.classList.remove("error");
+});
+</script>
+</body>
+</html>
